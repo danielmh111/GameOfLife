@@ -2,7 +2,7 @@ from itertools import product
 from pprint import pprint 
 from random import randint
 
-# A Game of Life, played on a 10x10 grid as a test case
+# A Game of Life, played on a random grid as a test case
 
 # rule 1: any live cell with fewer than two live neighbours dies
 # rule 2: any live cell with two or three live neighbours lives on to the next turn
@@ -21,12 +21,9 @@ def get_cell(grid, row, column):
 def is_alive(cell):
     return cell == 1
 
-def get_neighbours_coords(cell_coords):
+def get_neighbours_coords(cell_coords, grid_dim):
 
-    modifiers = list(
-        product([-1,0,1], [-1,0,1])
-        )
-
+    modifiers = product([-1,0,1], [-1,0,1])
     x, y = cell_coords
 
     return [
@@ -59,24 +56,25 @@ def play_the_game(start_grid, max_generations=100):
             for y, cell in enumerate(row):
 
                 cell: int = get_cell(grid=grid, row=x, column=y)
-                neighbour_coords = get_neighbours_coords(cell_coords=(x,y))
+                neighbour_coords = get_neighbours_coords(cell_coords=(x,y), grid_dim=len(grid))
                 num_neighbours_living = count_living_neighbours(neighbour_coords=neighbour_coords, grid=grid)
 
-                if num_neighbours_living < 2 or num_neighbours_living >= 4 or (num_neighbours_living != 3 and not is_alive(cell)):
+                if num_neighbours_living < 2 or num_neighbours_living >= 4 or (num_neighbours_living != 3 and not is_alive(cell)): #rule one or rule three
                     next_value = 0
-                elif (num_neighbours_living in {2,3} and is_alive(cell)) or (num_neighbours_living == 3 and not is_alive(cell)):
+                elif (num_neighbours_living in {2,3} and is_alive(cell)) or (num_neighbours_living == 3 and not is_alive(cell)): #rule two or rule four
                     next_value = 1
 
                 new_row.append(next_value)
 
             next_grid.append(new_row)
 
+        pprint(next_grid)
+        
         if grid == next_grid:
-            print(f"the grid stablized after {generation - 1} generations")
+            print(f"the grid stablized after {generation} generations")
             break
 
         grid = next_grid
-        pprint(next_grid)
 
         if count_all_living_cells(grid) == 0:
             print(f"the grid is dead after {generation} generations")
