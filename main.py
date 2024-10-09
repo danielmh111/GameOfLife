@@ -70,31 +70,38 @@ if __name__ == '__main__':
 
     pprint(grid)
 
-    next_grid = []
+    generation = 1
 
-    for x, row in enumerate(grid):
-        new_row = []
-        for y, cell in enumerate(row):
+    while generation <= 100:
 
-            cell_coords: tuple[int, int] = (x,y)
-            row, column = cell_coords
-            cell: int = get_cell(grid=grid, row=row, column=column)
+        print(f"generation {generation}")
+        generation += 1
 
-            neighbour_coords = get_neighbours_coords(cell_coords=cell_coords)
-            num_neighbours_living = count_living_neighbours(neighbour_coords=neighbour_coords, grid=grid)
+        next_grid = []
 
-            print(f"cell at {cell_coords} is {"alive" if is_alive(cell) else "dead"} and has {num_neighbours_living} living neighbours")
+        for x, row in enumerate(grid):
+            new_row = []
+            for y, cell in enumerate(row):
 
-            if num_neighbours_living < 2 or num_neighbours_living >= 4 or (num_neighbours_living != 3 and not is_alive(cell)):
-                next_value = 0
-            elif (num_neighbours_living in {2,3} and is_alive(cell)) or (num_neighbours_living == 3 and not is_alive(cell)):
-                next_value = 1
+                cell_coords: tuple[int, int] = (x,y)
+                row, column = cell_coords
+                cell: int = get_cell(grid=grid, row=row, column=column)
 
-            new_row.append(next_value)
+                neighbour_coords = get_neighbours_coords(cell_coords=cell_coords)
+                num_neighbours_living = count_living_neighbours(neighbour_coords=neighbour_coords, grid=grid)
 
-        next_grid.append(new_row)
+                # print(f"cell at {cell_coords} is {"alive" if is_alive(cell) else "dead"} and has {num_neighbours_living} living neighbours")
 
-    pprint(next_grid)
+                if num_neighbours_living < 2 or num_neighbours_living >= 4 or (num_neighbours_living != 3 and not is_alive(cell)):
+                    next_value = 0
+                elif (num_neighbours_living in {2,3} and is_alive(cell)) or (num_neighbours_living == 3 and not is_alive(cell)):
+                    next_value = 1
+
+                new_row.append(next_value)
+
+            next_grid.append(new_row)
+        grid = next_grid
+        pprint(next_grid)
 
     print("done")
 
