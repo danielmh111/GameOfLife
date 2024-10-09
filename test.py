@@ -27,16 +27,16 @@ blank_grid = [
 ]
 
 test_grid = [
+    [0,0,0,0,0,0,0,0,1,1],
+    [0,0,0,0,0,0,0,0,1,1],
     [0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,0,0,1,0,0,0,0],
+    [0,0,0,0,0,0,1,0,0,0],
+    [0,0,0,0,0,1,0,1,0,0],
     [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,1,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,1,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
+    [1,0,1,0,1,0,0,0,0,0],
+    [1,1,0,0,0,0,0,0,0,0],
+    [1,1,1,0,0,0,0,0,0,0],
 ]
 
 def get_cell(grid, row, column):
@@ -47,13 +47,17 @@ def is_alive(cell):
 
 def get_neighbours_coords(cell_coords):
 
-    x, y = cell_coords
-
     modifiers = list(
         product([-1,0,1], [-1,0,1])
         )
 
-    return [(x + a, y + b) for [a, b] in modifiers if (x + a, y + b) != cell_coords]
+    x, y = cell_coords
+
+    return [
+        (x + a, y + b) 
+        for [a, b] in modifiers 
+        if (x + a, y + b) != cell_coords and 0 <= x + a < 10 and 0 <= y + b < 10
+    ]
 
 def count_living_neighbours(neighbour_coords: list[tuple[int,int], ], grid: list[list[int,]]):
     return sum (
@@ -63,26 +67,34 @@ def count_living_neighbours(neighbour_coords: list[tuple[int,int], ], grid: list
 
 if __name__ == '__main__':
     grid: list[list[int,],] = test_grid
-    cell_coords: tuple[int, int] = (4,5)
-    row, column = cell_coords
-    cell: int = get_cell(grid=grid, row=row, column=column)
-
-    neighbour_coords = get_neighbours_coords(cell_coords=cell_coords)
-    num_neighbours_living = count_living_neighbours(neighbour_coords=neighbour_coords, grid=grid)
 
     pprint(grid)
-    print(f"cell at {cell_coords} is {"alive" if is_alive(cell) else "dead"} and has {num_neighbours_living} living neighbours")
 
+    next_grid = []
 
+    for x, row in enumerate(grid):
+        new_row = []
+        for y, cell in enumerate(row):
 
-    if num_neighbours_living < 2 or num_neighbours_living >= 4:
-        print("cell dies")
-    elif num_neighbours_living in {2,3} and is_alive(cell):
-        print("cell stays alive if alive")
-    elif num_neighbours_living == 3 and not is_alive(cell):
-        print("cell comes to life if dead")
-    elif num_neighbours_living != 3 and not is_alive(cell):
-        print("cell will remain dead")
+            cell_coords: tuple[int, int] = (x,y)
+            row, column = cell_coords
+            cell: int = get_cell(grid=grid, row=row, column=column)
+
+            neighbour_coords = get_neighbours_coords(cell_coords=cell_coords)
+            num_neighbours_living = count_living_neighbours(neighbour_coords=neighbour_coords, grid=grid)
+
+            print(f"cell at {cell_coords} is {"alive" if is_alive(cell) else "dead"} and has {num_neighbours_living} living neighbours")
+
+            if num_neighbours_living < 2 or num_neighbours_living >= 4 or (num_neighbours_living != 3 and not is_alive(cell)):
+                next_value = 0
+            elif (num_neighbours_living in {2,3} and is_alive(cell)) or (num_neighbours_living == 3 and not is_alive(cell)):
+                next_value = 1
+
+            new_row.append(next_value)
+
+        next_grid.append(new_row)
+
+    pprint(next_grid)
 
     print("done")
 
