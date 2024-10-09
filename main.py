@@ -1,43 +1,19 @@
 from itertools import product
 from pprint import pprint 
+from random import randint
 
 # A Game of Life, played on a 10x10 grid as a test case
 
 # rule 1: any live cell with fewer than two live neighbours dies
-
 # rule 2: any live cell with two or three live neighbours lives on to the next turn
-
 # rule 3: any live cell with more than three live neighbours dies
-
 # rule 4: any dead cell with exactly three live neighbours becomes a live cell on the next turn
 
+def create_random_row(grid_size):
+    return [randint(0,1) for _ in range(grid_size)]
 
-# a blank 10x10 grid
-blank_grid = [
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-]
-
-test_grid = [
-    [0,0,0,0,0,0,0,0,1,1],
-    [0,0,0,0,0,0,0,0,1,1],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,1,0,0,1,0,0,0,0],
-    [0,0,0,0,0,0,1,0,0,0],
-    [0,0,0,0,0,1,0,1,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [1,0,1,0,1,0,0,0,0,0],
-    [1,1,0,0,0,0,0,0,0,0],
-    [1,1,1,0,0,0,0,0,0,0],
-]
+def create_random_grid(grid_size: int = 10):
+    return [create_random_row(grid_size) for _ in range(grid_size)]
 
 def get_cell(grid, row, column):
     return grid[row][column]
@@ -62,35 +38,29 @@ def get_neighbours_coords(cell_coords):
 def count_living_neighbours(neighbour_coords: list[tuple[int,int], ], grid: list[list[int,]]):
     return sum (
         [grid[x][y] for x,y in neighbour_coords]
-    )    
+    )   
+
+def count_all_living_cells(grid):
+    return  sum([sum(row) for row in grid])
+
+def play_the_game(start_grid, max_generations=100):
     
-
-if __name__ == '__main__':
-    grid: list[list[int,],] = test_grid
-
+    grid = start_grid
     pprint(grid)
 
-    generation = 1
+    generation = 1  
 
-    while generation <= 100:
-
+    while generation <= max_generations:
         print(f"generation {generation}")
-        generation += 1
-
         next_grid = []
 
         for x, row in enumerate(grid):
             new_row = []
             for y, cell in enumerate(row):
 
-                cell_coords: tuple[int, int] = (x,y)
-                row, column = cell_coords
-                cell: int = get_cell(grid=grid, row=row, column=column)
-
-                neighbour_coords = get_neighbours_coords(cell_coords=cell_coords)
+                cell: int = get_cell(grid=grid, row=x, column=y)
+                neighbour_coords = get_neighbours_coords(cell_coords=(x,y))
                 num_neighbours_living = count_living_neighbours(neighbour_coords=neighbour_coords, grid=grid)
-
-                # print(f"cell at {cell_coords} is {"alive" if is_alive(cell) else "dead"} and has {num_neighbours_living} living neighbours")
 
                 if num_neighbours_living < 2 or num_neighbours_living >= 4 or (num_neighbours_living != 3 and not is_alive(cell)):
                     next_value = 0
@@ -100,9 +70,21 @@ if __name__ == '__main__':
                 new_row.append(next_value)
 
             next_grid.append(new_row)
+
+        if grid == next_grid:
+            print(f"the grid stablized after {generation - 1} generations")
+            break
+
         grid = next_grid
         pprint(next_grid)
 
-    print("done")
+        if count_all_living_cells(grid) == 0:
+            print(f"the grid is dead after {generation} generations")
+            break
 
+        generation += 1
 
+if __name__ == '__main__':
+    grid = create_random_grid(grid_size=25)
+    play_the_game(start_grid=grid)
+    print("~FIN~")
