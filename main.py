@@ -41,14 +41,16 @@ def count_all_living_cells(grid):
     return  sum([sum(row) for row in grid])
 
 def play_the_game(start_grid, max_generations=100):
-    
     grid = start_grid
-    pprint(grid)
-
     generation = 1  
 
     while generation <= max_generations:
-        print(f"generation {generation}")
+
+        if generation == 1:
+            yield generation, grid
+            generation += 1
+            continue
+
         next_grid = []
 
         for x, row in enumerate(grid):
@@ -67,22 +69,35 @@ def play_the_game(start_grid, max_generations=100):
                 new_row.append(next_value)
 
             next_grid.append(new_row)
-
-        pprint(next_grid)
+        
+        yield generation, next_grid
         
         if grid == next_grid:
-            print(f"the grid stablized after {generation} generations")
+            yield generation, f"the grid stablized after {generation} generations"
             break
 
         grid = next_grid
 
         if count_all_living_cells(grid) == 0:
-            print(f"the grid is dead after {generation} generations")
-            break
+            yield generation, f"the grid stablized after {generation} generations"
+            break 
 
+        if generation == max_generations:
+            yield generation, f"the grid is still living after {generation} generation but it is not stable. Max generations reached, so the simulation has halted."
         generation += 1
 
-if __name__ == '__main__':
+
+def main():
     grid = create_random_grid(grid_size=25)
-    play_the_game(start_grid=grid)
+
+    turns = play_the_game(start_grid=grid)
+
+    for turn in turns:
+        generation, state = turn
+        print(f"generation {generation}")
+        pprint(state)
+
+
+if __name__ == '__main__':
+    main()
     print("~FIN~")
