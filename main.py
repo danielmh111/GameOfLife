@@ -1,6 +1,11 @@
 from itertools import product
 from pprint import pprint 
 from random import randint
+import matplotlib.pyplot as plt
+import matplotlib.animation as ani
+from matplotlib import colors
+from pathlib import Path
+from time import sleep 
 
 # A Game of Life, played on a random grid as a test case
 
@@ -29,7 +34,7 @@ def get_neighbours_coords(cell_coords, grid_dim):
     return [
         (x + a, y + b) 
         for [a, b] in modifiers 
-        if (x + a, y + b) != cell_coords and 0 <= x + a < 10 and 0 <= y + b < 10
+        if (x + a, y + b) != cell_coords and 0 <= x + a < grid_dim and 0 <= y + b < grid_dim
     ]
 
 def count_living_neighbours(neighbour_coords: list[tuple[int,int], ], grid: list[list[int,]]):
@@ -90,7 +95,7 @@ def play_the_game(start_grid, max_generations=100):
 def main():
     grid = create_random_grid(grid_size=25)
 
-    turns = play_the_game(start_grid=grid)
+    turns = play_the_game(start_grid=grid, max_generations=250)
 
     for turn in turns:
         generation, state = turn
@@ -98,6 +103,45 @@ def main():
         pprint(state)
 
 
+def plot_grid(turns):
+    filepath = Path(r"C:\Users\Daniel\projects\GameOfLife\testplot.mp4")
+    figure, ax = plt.subplots()
+    cmap = colors.ListedColormap(['w', 'b'])
+    plots = []
+    
+    counter = 1
+    
+    for turn in turns:
+        generation, grid = turn
+        
+        plot = ax.imshow(grid, cmap=cmap)
+        # ax.set_title(f"Generation {generation}")
+        
+        plots.append([plot,])
+        counter += 1
+
+    animation = ani.ArtistAnimation(fig=figure, artists=plots, interval=100)
+    
+    writer = ani.FFMpegWriter(
+        fps=12
+    )
+    animation.save(
+        filename='test_anim.mp4'
+        ,writer=writer
+        )
+    
+    return animation
+
+
+
+
 if __name__ == '__main__':
-    main()
-    print("~FIN~")
+    # main()
+    # print("~FIN~")
+
+    grid = create_random_grid(grid_size=100)
+    turns = play_the_game(start_grid=grid, max_generations=500)
+    turns = [turn for turn in turns]
+    turns.pop()
+    plot_grid(turns)
+    print("Done")
