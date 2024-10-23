@@ -140,7 +140,7 @@ if __name__ == '__main__':
     # print("~FIN~")
 
     grid = create_random_grid(grid_size=100)
-    turns = play_the_game(start_grid=grid, max_generations=500)
+    turns = play_the_game(start_grid=grid, max_generations=5000)
     turns = [turn for turn in turns]
     turns.pop()
     plot_grid(turns)
